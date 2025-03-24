@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart';
 import 'package:minio/minio.dart';
 import 'package:minio/src/minio_helpers.dart';
@@ -158,7 +159,10 @@ class MinioClient {
     request.body = payload;
 
     final date = DateTime.now().toUtc();
-    final sha256sum = enableSHA256 ? sha256Hex(payload) : 'UNSIGNED-PAYLOAD';
+    final payloadBytes = utf8.encode(payload);
+    final sha256sum = sha256.convert(payloadBytes).toString();
+
+    // final sha256sum = enableSHA256 ? sha256Hex(payload) : 'UNSIGNED-PAYLOAD';
     request.headers.addAll({
       'user-agent': userAgent,
       'x-amz-date': makeDateLong(date),
